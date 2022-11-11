@@ -17,7 +17,7 @@ In this readme file, I will walk through the following contents:
 3. A high-level summary of the feature engineering and data argumentation steps I explored
 4. A high-level summary of how I iterate my modeling approaches to receive a **top 3%** rank in this competition (by 11/9/2022)
 
-![1668055223531](images\curren_ranking_11_9)
+![1668055223531](images/curren_ranking_11_9)
 
 
 
@@ -81,13 +81,13 @@ All the plots created in EDA can be found in `/notebook/1. Exploration Data Anal
 
 The data collected at San Juan has a significantly different distribution from the data collected at Iquitos. Here is an example:
 
-![1668059297888](images\feature_distribution_diff)
+![1668059297888](images/feature_distribution_diff)
 
 Due to such differences in data distribution, it is much more efficient to build one model for each region instead one model for both regions.
 
 ## 3.2 Long-tailed Distribution in Target Variable
 
-![1668059753532](G:\operation d\active project\const_hw\images\target_distirbution)
+![1668059753532](images/target_distirbution)
 
 The target variable distribution is heavily screwed. Such a pattern could be fitted with a Tweedie or Poisson distribution. Thus, a generalized linear model with a Tweedie distribution or Poisson distribution could be one of the potential modeling approaches for this dataset.
 
@@ -95,17 +95,17 @@ The target variable distribution is heavily screwed. Such a pattern could be fit
 
 I compared the variables in both train and test set, and did not see any huge difference in distribution. In this case, I would feel more conformable using linear models as the variables in test set do not extrapolate beyond the range of the variables in train set. Here is an example, more figures could be found in `/notebook/1. Exploration Data Analysis.ipynb`
 
-![1668060119213](images\train_test_distribution)
+![1668060119213](images/train_test_distribution)
 
 ## 3.4 Strong Correlations between Variables
 
-![1668060371954](G:\operation d\active project\const_hw\images\correlation)
+![1668060371954](images/correlation)
 
 There are some strong correlations between some variables. For example, in San Juan data, `reanalysis_sat_precip_amt_mm` is identical to `precipitation_amt_mm`. After checking the variance inflation factors, only 8 variables have VIF less than 5.
 
 ## 3.5 Missing Values
 
-![1668061069992](images\missing_value)
+![1668061069992](images/missing_value)
 
 Missing values exist in both the train and test data set. The missing rate is low. Since each feature could be treated as a time series. The most efficient way is to impute the missing value with interpolation from neighboring values.
 
@@ -126,13 +126,13 @@ Each model was slightly tuned through cross-validation and the cross-validation 
 
 Based on the cross-validation score, I built the baseline model with XGBoost. After submitting the prediction,  I got a score of 29.264.
 
-![1668062062338](G:\operation d\active project\const_hw\images\base_line_score)
+![1668062062338](images/base_line_score)
 
 The predictions are shown below:
 
-![1668062703579](images\base_line_plot1)
+![1668062703579](images/base_line_plot1)
 
-![1668062772829](images\base_line_plot2)
+![1668062772829](images/base_line_plot2)
 
 The key takeaways are the following:
 
@@ -246,7 +246,7 @@ The other two algorithms I used is support vector regressor and XGboost. This tw
 
 If we treated the target variable as continuous numerical variables. its distribution is very similar to Tweedie distribution with Tweedie power of 1.5. The target variable has a bunch of data point close to zero and the rest having large non-negative continuous values. 
 
-![1668097252899](C:\Users\jb_dx\AppData\Roaming\Typora\typora-user-images\1668097252899.png)![1668059753532](G:\operation d\active project\const_hw\images\target_distirbution)
+![1668097252899](images/1668097252899.png)![1668059753532](images/target_distirbution)
 
 The objective of Tweedie regression aims to maximize the log likelihood of the Tweedie distribution
 $$
@@ -287,21 +287,21 @@ Ensemble modeling are a machine learning approach to combine multiple other mode
 
 
 
-![1668106460958](C:\Users\jb_dx\AppData\Roaming\Typora\typora-user-images\1668106460958.png)
+![1668106460958](images/ensembleflowchart)
 
 The illustration above shows how the ensemble modeling approach was used in this work. Once each model is tuned through cross-validation. I aggregated the prediction results together and weighted each prediction with the cross-validation score. This allows the base models that have higher performance to have larger weights in the ensemble prediction result.
 
 ## 6.4 Results
 
-![1668107229971](G:\operation d\active project\const_hw\images\one_staged_prediction_on test)
+![1668107229971](images/one_staged_prediction_on test)
 
 The final prediction achieves  MAE 22.6418 on the test data.
 
-![1668107470688](C:\Users\jb_dx\AppData\Roaming\Typora\typora-user-images\1668107470688.png)
+![1668107470688](images/1668107470688.png)
 
 Here is the Ensemble one-staged model prediction on the training data.
 
-![1668107522731](G:\operation d\active project\const_hw\images\one-staged_prediction_train)
+![1668107522731](images/one-staged_prediction_train)
 
 Compared to the base model, the ensemble one-staged model did a better job on capture the outbreak cases in the data. Especially in the outbreak in SJ region. However, the magnitude of the outbreak was much lower than the actual outbreak cases. Thus, in order to further improve the model performance, I will need to find a way to capture the outbreak peak. Such method will be described in the next section.
 
@@ -313,7 +313,7 @@ Based on the results from previous section, the limitation of the one staged mod
 
 Based on this idea, I developed the following approach:
 
-![1668135429742](images\two-stage model explaination)
+![1668135429742](images/two-stage model explaination)
 
 1. Select the top 10% dengue cases as the outbreak. Convert the target variable into binary labels. Positive class represent the outbreak peaks, while the rest of the data are negative class
 2. Build the 1st stage model to predict the whether an outbreak would occurs or not. Thus, this is a classification model.
@@ -323,13 +323,13 @@ Based on this idea, I developed the following approach:
 
 ## 7.2 Results
 
-![1668114076933](images\two_vs_one)
+![1668114076933](images/two_vs_one)
 
 Here is the results for two-stage model. Compared to the one-stage model predictions 3 outbreak appears on the SJ test data and 5 outbreaks appears on the IQ test data. 
 
 This prediction achieved a MAE of 20.9591 on the test set, which is bigger improvement than the one-staged model. 
 
-![1668135487789](images\best_score)
+![1668135487789](images/best_score)
 
 # 8. Summary
 
@@ -343,15 +343,15 @@ Beside the modeling approaches above. I also explored two different neural netwo
 
 The first trial is in `/notebook/Appendix - LSTM Trial 1.ipynb`.  In this trial, I only included the target variable in the data. The prediction on the test set looks like this:
 
-![1668114487799](C:\Users\jb_dx\AppData\Roaming\Typora\typora-user-images\1668114487799.png)
+![1668114487799](images/1668114487799.png)
 
 Apparently, the target variable only is not sufficient to predict the events in the future time. Therefore, in the second trial, I included all input variables and augmented variables to the LSTM model, and achieved a score of  27.752 on the test set. The code of the second trial is located in `Appendix - LSTM Trial 2.ipynb`
 
-![1668134927289](C:\Users\jb_dx\AppData\Roaming\Typora\typora-user-images\1668134927289.png)
+![1668134927289](images/1668134927289.png)
 
 
 
-![1668115726224](images\LSTMvsonestage)
+![1668115726224](images/LSTMvsonestage)
 
 
 
@@ -361,5 +361,5 @@ I also tried a multi-Layer Perceptron Neural Network. This is a feedforward neur
 
 The code of this MLP model can be found in `/notebook/Appendix - MLP Trial 1.ipynb`. This model achieved a score of 25.2139 on the test set.
 
-![1668136013152](G:\operation d\active project\const_hw\images\mlp)
+![1668136013152](images/mlp)
 
