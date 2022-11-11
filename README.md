@@ -313,7 +313,7 @@ Based on the results from previous section, the limitation of the one staged mod
 
 Based on this idea, I developed the following approach:
 
-![1668135429742](images/two-stage model explaination)
+![1668135429742](images/two-stage-flow)
 
 1. Select the top 10% dengue cases as the outbreak. Convert the target variable into binary labels. Positive class represent the outbreak peaks, while the rest of the data are negative class
 2. Build the 1st stage model to predict the whether an outbreak would occurs or not. Thus, this is a classification model.
