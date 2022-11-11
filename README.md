@@ -154,25 +154,23 @@ This python class is used to encode categorical variables in the data. There are
 - week of year
 - month
 
-If the outbreak of dengue infection follows periodical patterns, including these two categorical variables will help improve the model performance, which also makes sense in intuition. This is because dengue infection is caused by mosquito, and the growth of mosquito number is highly affected by seasonal climate
+If the outbreak of dengue infection follows periodical patterns, including these two categorical variables will help improve the model performance, which also makes sense in intuition. This is because dengue infection is caused by mosquitoes, and the growth of mosquito numbers is highly affected by seasonal climate
 
-"month" variable can be easily encoded into dummy variable using one hot encoding method.
+The "month" variable can be easily encoded into dummy variables using one hot encoding method.
 
-However, for "week of year", there are 53 weeks per year. For such high cardinality variable, I applied target encoding, which replace a categorical feature with average target value of all data points belong to the category.
+However, for "week of year", there are 53 weeks per year. For such high cardinality variable, I applied target encoding, which replaces a categorical feature with the average target value of all data points belonging to the category.
 
 ## 5.2 Stationarity_adjustment Class
 
 A stationary time series is one whose properties do not depend on the time at which the series is observed. Thus, time series with trends, or with seasonality, are not stationary — the trend and seasonality will affect the value of the time series at different times.
 
-A non stationary feature, such as the feature value continuously grows or its variance grows over time, will lead to serious prediction error, especially in the future data.
+A non-stationary feature, such as the feature value continuously growing or its variance growing over time, will lead to serious prediction errors, especially in future data.
 
-In this dataset, all the original predictors are time-series feature. Thus, it is important to check the stationarity. If stationarity check failed, we could apply differencing method to make a non-stationary time series stationary
+In this dataset, all the original predictors are time-series features. Thus, it is important to check the stationarity. If the stationarity check failed, we could apply the differencing method to make a non-stationary time series stationary
 
 reference: https://otexts.com/fpp2/stationarity.html
 
-Based on the data exploration analysis, I did not observes any significant feature value growth over time. However, some predictors seems to have little unconditional variance that grows over time. This will lead to a condition called unit-root. One method of test unit-root is Augmented Dickey Fuller test. During the test, if we obtain a p-value less than 0.05, we could safely reject the null hypothesis(null hypothesis: the feature suffers from a unit-root stationary). Otherwise, we could apply differencing method to fix it.
-
-One thing I observed is that, a few features fail the stationarity check in the train set, but did not fail the stationarity check in the test set. 
+Based on the data exploration analysis, I did not observe any significant feature value growth over time. However, some predictors seem to have a little unconditional variance that grows over time. This will lead to a condition called unit-root. One method of test unit-root is Augmented Dickey Fuller test. During the test, if we obtain a p-value less than 0.05, we could safely reject the null hypothesis(null hypothesis: the feature suffers from a unit-root stationary). Otherwise, we could apply the differencing method to fix it.
 
 ## 5.3 Feature_argumentation1 Class
 
@@ -191,14 +189,14 @@ Standardize features by removing the mean and scaling to unit variance. This is 
 
 ## 5.5 Imputer Class
 
-This class is to impute missing values. There are two mode:
+This class is to impute missing values. There are two modes:
 
 1. mode 0: impute missing value using linear interpolation
 2. mode 1: impute missing value using K-nearest neighbors.
 
-If mode 1 is on , it is better to standardize the data before apply the imputer, since KNN is based on distance between data points
+If KNN imputer was used, then it was better to standardize the data before applying the imputer, since KNN is based on the distance between data points
 
-However, in later model iteration, it seems that applying linear interpolation is more efficient and reasonable.
+However, in later model iterations, it seems that applying linear interpolation is more efficient and reasonable. Thus, in the final model, the missing value was imputed by using linear interpolation.
 
 ## 5.6 Feature_argumentation 2
 
@@ -207,23 +205,23 @@ This class creates two types of features:
 1. time drift features
 2. time gradient features
 
-Since dengue infection is caused by mosquitoes and the number of mosquitoes are affected by the climate. When the climate reaches to a condition where mosquitos will grow and spread quickly, It may takes a few days for the mosquitoes to spread and 4 to 8 days until the infection synonym appears. Therefore, the climate condition on the day where dengue infection outbreaks may not be the condition that causes such outbreak.  There may be a time drift between input variables and target variables. However, we do not know the length of the drift period. Therefor, I set drift period to 52, which is a year length. Then for each variable,  52 additional variables are created. Each additional variable presents a drift period. 
+Since dengue infection is caused by mosquitoes and the number of mosquitoes is affected by the climate. When the climate reaches a condition where mosquitos will grow and spread quickly, It may take a few days for the mosquitoes to spread and 4 to 8 days until the infection synonym appears. Therefore, the climate condition on the day when dengue infection outbreaks may not be the condition that causes a  such outbreak.  There may be a time drift between input variables and target variables. However, we do not know the length of the drift period. Therefore, I set the drift period to 52, which is a year long. Then for each variable,  52 additional variables are created. Each additional variable presents a drift period. 
 
-Gradient features are derived by calculating the gradient of a feature value across time. Such features could be used to capture some sudden climate changes in the past time period. For example, if a large gradient of temperature value appears, it means there is a sudden temperature change in the past a few days. Such dramatic change may affect the number of mosquitoes in that region.
+Gradient features are derived by calculating the gradient of a feature value across time. Such features could be used to capture some sudden climate changes in the past time period. For example, if a large gradient of temperature value appears, it means there is a sudden temperature change in the past few days. Such dramatic change may affect the number of mosquitoes in that region.
 
 ## 5.7 Feature_argumentation 3
 
-This class applied polynomial transformation to the features. This class will only apply polynomial transformation to the features except the features created by Feature_argumentation2 class. 
+This class applied a polynomial transformation to the features. This class will only apply the polynomial transformation to the features except the features created by Feature_argumentation2 class. 
 
 ## 5.8 Feature_selection
 
 After three feature argumentation steps, I have created more than one thousand new features. It is important to apply a feature selection process to remove redundant and correlated features. Otherwise, the model built based on such features will be highly unstable.
 
-Due to the large amount of correlated features in the data, PCA will be a good choice here. PCA converts the data from a large amount of features into a small number of principal component while maintain the maximum variation in the original data. This will not only get rid of the correlation in the data, but also significantly reduce the size of the data.
+Due to the large number of correlated features in the data, PCA will be a good choice here. PCA converts the data from the large number of features into a small number of principal components while maintaining the maximum variation in the original data. This will not only get rid of the correlation in the data but also significantly reduce the size of the data.
 
-However, converting the features to principal component will make it difficult to explain the model. If the goal of this assessment is to archive a high ranking in this competition, I would go with PCA. In real business scenario, if the model explanation is a requirement, then it is better not to transform the original features to principal component. There, I included an automatic feature selection method in `/src/_helper_class.py`based on this paper https://ieeexplore.ieee.org/abstract/document/8871132.
+However, converting the features to principal components will make it difficult to explain the model. If the goal of this assessment is to archive a high ranking in this competition, I would go with PCA. In a real business scenario, if the model explanation is a requirement, then it is better not to transform the original features to principal components. There, I included an automatic feature selection method in `/src/_helper_class.py` based on this paper https://ieeexplore.ieee.org/abstract/document/8871132.
 
-This method reversed the relationship between features and observations. Each feature is treated as a single observation. A hieratical clustering algorithm is applied to group similar feature together. After that, we apply three different models on the original data set to estimate the importance of each feature. Based on the importance predicted by each model, we will select the most important variable in each cluster. Then, we aggregate the variable selection together as the final selection. This method is effective to select the most important and uncorrelated features effectively. However, this method could be computational expensive if the data size is large
+This method reversed the relationship between features and observations. Each feature is treated as a single observation. A hieratical clustering algorithm is applied to group similar features together. After that, we apply three different models to the original data set to estimate the importance of each feature. Based on the importance predicted by each model, we will select the most important variable in each cluster. Then, we aggregate the variable selection together as the final selection. This method is effective to select the most important and uncorrelated features effectively. However, this method could be computationally expensive if the data size is large
 
 # 6. Ensemble One-staged Model 
 
@@ -232,19 +230,19 @@ This method reversed the relationship between features and observations. Each fe
 Once the data is prepared, the first method I explored is one-staged model stacking. To break it down:
 
 1. "one-staged" means the target variable is predicted by the model directly.
-2. "Ensemble" means the final prediction are aggregated by the predictions of several different models.
+2. "Ensemble" means the final prediction is aggregated by the predictions of several different models.
 
 ## 6.2 Candidate One-staged Models
 
-Based on the time limitation of this assessment, I only included four different one-staged models algorithms. 
+Based on the time limit of this assessment, I only included four different one-staged model algorithms. 
 
 The first two algorithms are generalized linear regression with Poisson distribution and generalized linear regression with Tweedie distribution.  These two models are parametric models
 
-The other two algorithms I used is support vector regressor and XGboost. This two models are non-parametric models
+The other two algorithms I used are support vector regressor and XGboost. These two models are non-parametric models
 
 ### Tweedie regression
 
-If we treated the target variable as continuous numerical variables. its distribution is very similar to Tweedie distribution with Tweedie power of 1.5. The target variable has a bunch of data point close to zero and the rest having large non-negative continuous values. 
+If we treated the target variable as continuous numerical variables. its distribution is very similar to Tweedie distribution with a tweedie power of 1.5. The target variable has a bunch of data points close to zero and the rest have large non-negative continuous values. 
 
 ![1668097252899](images/1668097252899.png)![1668059753532](images/target_distirbution)
 
@@ -275,21 +273,21 @@ $$
 
 ### Support Vector Regression
 
- Support vector regression predict discrete target values. It uses the same principle as support vector machine. It find the hyperplane that maximum the number of points. Literature review shows that in the past dengue studies, SVR is one of model that has the highest performance. https://doi.org/10.1371/journal.pntd.0010056 , https://doi.org/10.1093/aje/kwac090. Therefore, I included it this work.
+ Support vector regression predicts discrete target values. It uses the same principle as support vector machine. It finds the hyperplane that maximizes the number of points. Literature review shows that in past dengue studies, SVR is one of the models that has the highest performance. https://doi.org/10.1371/journal.pntd.0010056 , https://doi.org/10.1093/aje/kwac090. Therefore, I included it this work.
 
 ### XGBoost
 
-The last non-parametric model I choose is XGBoost. This model delivers more accurate approximations by using the strengths of second order derivative of the loss function. It also provides more flexibility on tree structure used in the model. This model usually overperformed the other tree-based models as long as the model is probably tuned. Thus, I decided to include it here.
+The last non-parametric model I choose is XGBoost. This model delivers more accurate approximations by using the strengths of the second order derivative of the loss function. It also provides more flexibility on the tree structure used in the model. This model usually overperformed the other tree-based models as long as the model is probably tuned. Thus, I decided to include it here.
 
 ## 6.3 Ensemble
 
-Ensemble modeling are a machine learning approach to combine multiple other models in the prediction process. In this work, Tweedie regression, Poisson regression, SVR and XGBoost will be the base models for ensemble. 
+Ensemble modeling is a machine learning approach to combine multiple other models in the prediction process. In this work, Tweedie regression, Poisson regression, SVR and XGBoost will be the base models for the ensemble. 
 
 
 
 ![1668106460958](images/ensembleflowchart)
 
-The illustration above shows how the ensemble modeling approach was used in this work. Once each model is tuned through cross-validation. I aggregated the prediction results together and weighted each prediction with the cross-validation score. This allows the base models that have higher performance to have larger weights in the ensemble prediction result.
+The illustration above shows how the ensemble modeling approach was used in this work. Once each model is tuned through cross-validation. I aggregated the prediction results together and weighted each prediction with the cross-validation score. This allows the base models that have a higher performance to have larger weights in the ensemble prediction result.
 
 ## 6.4 Results
 
@@ -303,43 +301,59 @@ Here is the Ensemble one-staged model prediction on the training data.
 
 ![1668107522731](images/one-staged_prediction_train)
 
-Compared to the base model, the ensemble one-staged model did a better job on capture the outbreak cases in the data. Especially in the outbreak in SJ region. However, the magnitude of the outbreak was much lower than the actual outbreak cases. Thus, in order to further improve the model performance, I will need to find a way to capture the outbreak peak. Such method will be described in the next section.
+Compared to the base model, the ensemble one-staged model did a better job on capture the outbreak cases in the data. Especially in the outbreak in the SJ region. However, the magnitude of the outbreak was much lower than the actual outbreak cases. Thus, in order to further improve the model performance, I will need to find a way to capture the outbreak peak. Such a method will be described in the next section.
 
 # 7. Ensemble Two-Stage Model
 
 ## 7.1 Overview
 
-Based on the results from previous section, the limitation of the one staged model is the ability to predict the large outbreak cases. Therefore, a new method was developed. This method is inspired by the propensity + severity modeling approach for heavily skewed data, such as insurance claim loss. This modeling approach has two stages. The first stage is a classification model to predict the probability of an accident would occur. The second stage is a regression model to predict the potential loss if accident occurs. The predictions results of these two models are then multiped by each other to generate the final prediction. 
+Based on the results from the previous section, the limitation of the one-staged model is the ability to predict large outbreak cases. Therefore, a new method was developed. This method is inspired by the propensity + severity modeling approach for heavily skewed data, such as insurance claim loss. This modeling approach has two stages. The first stage is a classification model to predict the probability of an accident would occur. The second stage is a regression model to predict the potential loss if an accident occurs. The prediction results of these two models are then multiped by each other to generate the final prediction. 
 
 Based on this idea, I developed the following approach:
 
 ![1668135429742](images/two-stage-flow)
 
-1. Select the top 10% dengue cases as the outbreak. Convert the target variable into binary labels. Positive class represent the outbreak peaks, while the rest of the data are negative class
-2. Build the 1st stage model to predict the whether an outbreak would occurs or not. Thus, this is a classification model.
-3. Build the 2nd stage model to predict the cases during outbreak events. This is a regression model built based on these top 10% dengue cases only.
+1. Select the top 10% of dengue cases as the outbreak. Convert the target variable into binary labels. A positive class represents the outbreak peaks, while the rest of the data are the negative class
+2. Build the 1st stage model to predict whether an outbreak would occur or not. Thus, this is a classification model.
+3. Build the 2nd stage model to predict the cases during outbreak events. This is a regression model built based on these top 10% of dengue cases only.
 4. Combine the 1st stage and 2nd stage model prediction together. The final results will be the dengue cases on outbreak days.
-5. Combine the two-stage model prediction with the one-stage model prediction. In other word, if one day is predicted as a normal day, the prediction is determined by the one-stage model. If one day is predicted as an outbreak day, the prediction is determined by the two-stage model.
+5. Combine the two-stage model prediction with the one-stage model prediction. In other words, if one day is predicted as a normal day, the prediction is determined by the one-stage model. If one day is predicted as an outbreak day, the prediction is determined by the two-stage model.
+
+## 7.2 1st Staged Model
+
+The 1st Staged model predicts whether an outbreak would occur or not. The outbreak even is defined as the number of cases that are larger than 90% percentile in the overall data.  Therefore,  we have 10% positive labels and 90% negative labels. For such an imbalanced data set, I built my 1staged model by ensembling four classification modeling algorithms together: 1. XGBoost, 2. Random Forest. 3. GBM. 4. Logistic Regression. 
+
+The reason I included 3 tree-based models here is that such a non-parametric model could handle imbalanced data pretty well without artificially changing the distribution of the data (such as oversampling or undersampling ). In addition, I utilized the 1st staged model's prediction score (the probability of an event occurring) to determine the probability of an outbreak event occurring during a time period.  Thus, it is better not to  apply any sampling method or class weight method to handle the imbalance condition. This is because oversampling or under sampling is biasing the data  and putting more focus on the minority class. The prediction score was biased toward the minority class and will not reflect the probability that an outbreak occurs in the real world.
+
+After applying the 1st staged model to the test data set, we could see most positive predictions are clustered together, which makes total senses since an outbreak peak usually lasts for a few weeks.
+
+![1668144361863](images/1668144361863.png)
+
+## 7.3 2nd Staged Model
+
+The second staged model was an ensemble regression model built on the outbreak data. 
 
 ## 7.2 Results
 
+Once the 1st staged model was built, I applied it to the training set first and find out the prediction score at the 90% percentile. This prediction score will be used as the threshold. Then the 1st staged model is applied to the test set. Any test prediction score higher than the threshold will be treated as outbreak day. Then we combine the one-staged model prediction with the two-staged model prediction. If an outbreak occurs, then the prediction value will be determined by the 2nd-staged model from the ensemble two-stage model. Otherwise, the prediction value is determined by the one-staged model.
+
 ![1668114076933](images/two_vs_one)
 
-Here is the results for two-stage model. Compared to the one-stage model predictions 3 outbreak appears on the SJ test data and 5 outbreaks appears on the IQ test data. 
+Here are the results for two-staged model. Compared to the one-stage model predictions 3 outbreak appears on the SJ test data and 5 outbreaks appear on the IQ test data. 
 
-This prediction achieved a MAE of 20.9591 on the test set, which is bigger improvement than the one-staged model. 
+This prediction achieved an MAE of 20.9591 on the test set, which is a bigger improvement than the one-staged model. 
 
 ![1668135487789](images/best_score)
 
 # 8. Summary
 
-In summary, the best performed modeling approach is the ensemble two-stage model. In this model, an ensemble regression model was used to  predict the baseline of dengue cases across the time. A classification model was used to identify the potential time period where an outbreak may occurs. Then, another regression model was used to predict the number of dengue cases during the outbreak period.
+In summary, the best performing modeling approach is the ensemble two-stage model. In this model, an ensemble regression model was used to  predict the baseline of dengue cases across time. A classification model was used to identify the potential time period where an outbreak may occur. Then, another regression model was used to predict the number of dengue cases during the outbreak period.
 
-Besides the different modeling approaches I described above, I also explored several deep learning models. However, the results were not as good as the ensemble two-staged model. Due to the time limitation of this take-home assessment, I would not be able to further explore these methods. Therefore, I included a high level summary of the deep learning modeling approaches I explored in the appendix.
+Besides the different modeling approaches I described above, I also explored several deep-learning models. However, the results were not as good as the ensemble two-staged model. Due to the time limitation of this take-home assessment, I would not be able to further explore these methods. Therefore, I included a high-level summary of the deep-learning modeling approaches I explored in the appendix.
 
 # Appendix: LSTM
 
-Beside the modeling approaches above. I also explored two different neural network approach. The first one is LSTM. Since we are dealing with the time series data, LSTM would be a good choice. 
+Besides the modeling approaches above. I also explored two different neural network approaches. The first one is LSTM. Since we are dealing with time series data, LSTM would be a good choice. 
 
 The first trial is in `/notebook/Appendix - LSTM Trial 1.ipynb`.  In this trial, I only included the target variable in the data. The prediction on the test set looks like this:
 
@@ -357,7 +371,7 @@ Apparently, the target variable only is not sufficient to predict the events in 
 
 # Appendix: MLP
 
-I also tried a multi-Layer Perceptron Neural Network. This is a feedforward neural network with 3 hidden layer. Dropout was used between the hidden layers. 
+I also tried a multi-Layer Perceptron Neural Network. This is a feedforward neural network with 3 hidden layers. Dropout was used between the hidden layers. 
 
 The code of this MLP model can be found in `/notebook/Appendix - MLP Trial 1.ipynb`. This model achieved a score of 25.2139 on the test set.
 
